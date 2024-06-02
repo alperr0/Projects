@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
@@ -14,10 +15,10 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -32,9 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.MtgApiRequest;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
+import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.RecuperarMazosYFav;
 
 public class PanelFavoritos extends JPanel {
 
@@ -44,23 +43,32 @@ public class PanelFavoritos extends JPanel {
 	private JTable tablaRegistros;
 	DefaultTableModel model;
 	private MtgApiRequest api;
-	JFrame parentFrame;
-	JSONArray cardsInicial;
+	Main_Window parentFrame;
+	ArrayList<String> cardsFavoritos;
+	ArrayList<JSONObject> cardsJson;
+	Color colorPrimario = new Color(41, 41, 41); 
+	Color colorPanel = new Color(51, 51, 51);
+	Color colorBoton = new Color(34, 34, 34); 
+	Color colorTexto = new Color(221, 221, 221); 
 
 	/**
 	 * Create the panel.
 	 */
-	public PanelFavoritos(JFrame parentFrame) {
+	public PanelFavoritos(Main_Window parentFrame) {
 		this.parentFrame=parentFrame;
 		setAutoscrolls(true);
+		setBackground(colorPrimario);
 		setBounds(0, 0, 1252, 913);
 		setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel_IZQ = new JPanel();
+		panel_IZQ.setBackground(colorPrimario);
 		panel_IZQ.setPreferredSize(new Dimension(150, 10));
 		add(panel_IZQ, BorderLayout.WEST);
 		
 		JButton btnMisDecks = new JButton("Mis decks");
+		btnMisDecks.setBackground(colorBoton);
+		btnMisDecks.setForeground(colorTexto);
 		btnMisDecks.setMargin(new Insets(2, 20, 2, 20));
 		btnMisDecks.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -70,12 +78,15 @@ public class PanelFavoritos extends JPanel {
 		panel_IZQ.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		JPanel panel = new JPanel();
+		panel.setBackground(colorPrimario);
 		panel.setPreferredSize(new Dimension(140, 50));
 		panel_IZQ.add(panel);
 		btnMisDecks.setPreferredSize(new Dimension(120, 40));
 		panel_IZQ.add(btnMisDecks);
 		
 		JButton btnFavoritos = new JButton("Favoritos");
+		btnFavoritos.setBackground(colorBoton);
+		btnFavoritos.setForeground(colorTexto);
 		btnFavoritos.setMargin(new Insets(2, 20, 2, 20));
 		btnFavoritos.setBackground(UIManager.getColor("Button.highlight"));
 		btnFavoritos.addActionListener(new ActionListener() {
@@ -86,6 +97,8 @@ public class PanelFavoritos extends JPanel {
 		panel_IZQ.add(btnFavoritos);
 		
 		JButton btnSocial = new JButton("Social");
+		btnSocial.setBackground(colorBoton);
+		btnSocial.setForeground(colorTexto);
 		btnSocial.setMargin(new Insets(2, 20, 2, 20));
 		btnSocial.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -96,6 +109,8 @@ public class PanelFavoritos extends JPanel {
 		panel_IZQ.add(btnSocial);
 		
 		JButton btnLogout = new JButton("Log out");
+		btnLogout.setBackground(colorBoton);
+		btnLogout.setForeground(colorTexto);
 		btnLogout.setPreferredSize(new Dimension(120, 40));
 		btnLogout.setMargin(new Insets(2, 20, 2, 20));
 		btnLogout.addActionListener(new ActionListener() {
@@ -106,22 +121,26 @@ public class PanelFavoritos extends JPanel {
 		panel_IZQ.add(btnLogout);
 		
 		JPanel panel_NORTE = new JPanel();
+		panel_NORTE.setBackground(colorPrimario);
 		panel_NORTE.setPreferredSize(new Dimension(500, 80));
 		add(panel_NORTE, BorderLayout.NORTH);
 		panel_NORTE.setLayout(null);
 		
 		JPanel panel_CENTER = new JPanel();
+		panel_CENTER.setBackground(colorPrimario);
 		panel_CENTER.setAutoscrolls(true);
 		add(panel_CENTER, BorderLayout.CENTER);
 		panel_CENTER.setLayout(new BorderLayout(0, 0));
 		
 		//Paneles auxiliares dentro de panel_CENTER
 		JPanel panel_CENTER_NORTE = new JPanel();
+		panel_CENTER_NORTE.setBackground(colorPrimario);
 		panel_CENTER_NORTE.setPreferredSize(new Dimension(10, 60));
 		panel_CENTER.add(panel_CENTER_NORTE, BorderLayout.NORTH);
 		panel_CENTER_NORTE.setLayout(null);
 		
 		JPanel panel_CENTER_CENTER = new JPanel();
+		panel_CENTER_CENTER.setBackground(colorPrimario);
 		panel_CENTER_CENTER.setBorder(null);
 		panel_CENTER.add(panel_CENTER_CENTER, BorderLayout.CENTER);
 		
@@ -141,10 +160,11 @@ public class PanelFavoritos extends JPanel {
 		try {
 			
 			api = MtgApiRequest.getInstance();
-			cardsInicial = api.getInitialCards();
+			cardsFavoritos = RecuperarMazosYFav.recuperarCartasFavoritos(parentFrame.user);
+			cardsJson = api.getFavoritosCards(cardsFavoritos);
 
-	        for (int i = 0; i < cardsInicial.length(); i++) {
-	            JSONObject o = cardsInicial.getJSONObject(i);
+	        for (JSONObject o : cardsJson) {
+
 	         // Extraer información relevante de la respuesta JSON
 	            String nombre = o.getString("name");
 	            String año = o.optString("released_at", "Desconocido");
@@ -159,6 +179,8 @@ public class PanelFavoritos extends JPanel {
        
 		
 		JButton btnBuscar = new JButton("Buscar");
+		btnBuscar.setBackground(colorBoton);
+		btnBuscar.setForeground(colorTexto);
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -193,11 +215,14 @@ public class PanelFavoritos extends JPanel {
         });
 		//Botones de abajo
 		JPanel panelBotones = new JPanel();
+		panelBotones.setBackground(colorPrimario);
 		panelBotones.setAlignmentY(Component.TOP_ALIGNMENT);
 		panelBotones.setAlignmentX(Component.LEFT_ALIGNMENT);
 		panelBotones.setPreferredSize(new Dimension(100, 100));
 		
 		JButton btnIzquierda = new JButton();
+		btnIzquierda.setBackground(colorBoton);
+		btnIzquierda.setForeground(colorTexto);
 		btnIzquierda.setBounds(533, 5, 30, 30);
 		btnIzquierda.setPreferredSize(new Dimension(30, 30)); // Tamaño del botón
         ImageIcon iconIzquierda = new ImageIcon("C:\\Users\\admin\\Desktop\\flecha.png");
@@ -205,6 +230,8 @@ public class PanelFavoritos extends JPanel {
         btnIzquierda.setIcon(new ImageIcon(imgIzquierda));
 
 		JButton btnDerecha = new JButton();
+		btnDerecha.setBackground(colorBoton);
+		btnDerecha.setForeground(colorTexto);
 		btnDerecha.setBounds(568, 5, 30, 30);
 		btnDerecha.setPreferredSize(new Dimension(30, 30)); // Tamaño del botón
         ImageIcon iconDerecha = new ImageIcon("C:\\Users\\admin\\Desktop\\flecha-correcta.png");
@@ -218,6 +245,7 @@ public class PanelFavoritos extends JPanel {
 		panel_CENTER_CENTER.setLayout(new GridLayout(0, 2, 0, 0));
 		
 		JPanel panelRelleno = new JPanel();
+		panelRelleno.setBackground(colorPrimario);
 		panelRelleno.setMaximumSize(new Dimension(120, 32767));
 		panelRelleno.setPreferredSize(new Dimension(140, 10));
 		panel_IZQ.add(panelRelleno);
@@ -232,11 +260,20 @@ public class PanelFavoritos extends JPanel {
         };
 		tablaRegistros.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		tablaRegistros.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); //Permite seleccionar una sola fila
+		tablaRegistros.setSelectionForeground(colorTexto);
+		tablaRegistros.setForeground(colorTexto);
+		tablaRegistros.setSelectionBackground(colorBoton);
+		tablaRegistros.setBackground(colorPanel);
 		PanelDetalles panelDetalles = new PanelDetalles(parentFrame);
+		panelDetalles.setBackground(colorPrimario);
 		panelDetalles.setMinimumSize(new Dimension(100, 0));
 		panelDetalles.setPreferredSize(new Dimension(100, 800));
 		
 		JScrollPane scrollPane = new JScrollPane(tablaRegistros);
+		scrollPane.setBackground(colorPanel);
+		scrollPane.setForeground(colorPanel);
+		scrollPane.setPreferredSize(new Dimension(451, 302));
+		scrollPane.setBackground(new Color(128, 64, 0));
 		scrollPane.setPreferredSize(new Dimension(451, 302));
 		
 				tablaRegistros.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -286,16 +323,20 @@ public class PanelFavoritos extends JPanel {
         if (listener != null) {
         	switch(componente) {
         	case "btnMisDecks":
-        		listener.onPanelAction("Mis Decks");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Mis Decks",parentFrame.user);
         		break;
         	case "btnPrincipal":
-        		listener.onPanelAction("Principal");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Principal",parentFrame.user);
         		break;
         	case "btnSocial":
-        		listener.onPanelAction("Social");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Social",parentFrame.user);
         		break;
         	case "btnLogout":
-        		 listener.onPanelAction("Login");
+        		parentFrame.panelContent.remove(this);
+        		 listener.onPanelAction("Login",parentFrame.user);
         		break;
         	}
         }

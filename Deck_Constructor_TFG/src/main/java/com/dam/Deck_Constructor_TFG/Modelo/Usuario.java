@@ -27,15 +27,15 @@ public class Usuario {
 	
 	private String pass;
 	
-	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-	private List<Deck> decks = new ArrayList<>();
+	@OneToMany(mappedBy = "usuario", cascade = CascadeType.MERGE)
+	private List<Deck> decks;
 	
-	@OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_favs")
+	@OneToOne(cascade = CascadeType.MERGE)
+	@JoinColumn(name = "id_favs")
     private Favoritos favs;
 	
 	@OneToMany(mappedBy = "usuario")
-	private List<Amigo> amigos =new ArrayList<>();
+	private List<Amigo> amigos;
 	
 	public Usuario() {
 		
@@ -44,6 +44,8 @@ public class Usuario {
 	public Usuario(String name, String pass) {
 		this.name = name;
 		this.pass = pass;
+		this.decks = new ArrayList<>();
+		this.amigos =new ArrayList<>();
 	}
 
 	public int getId() {

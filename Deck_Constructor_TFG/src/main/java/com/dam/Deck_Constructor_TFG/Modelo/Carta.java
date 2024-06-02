@@ -22,7 +22,7 @@ public class Carta {
 	public int id;
 	
 	public String nombre;
-	
+	 
 	@ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.MERGE)
 	@JoinColumn(name = "id_deck")
 	private Deck deck;

@@ -30,13 +30,13 @@ public class Deck {
 	
 	public String formatoMTG;
 	
-	 @ManyToOne
+	 @ManyToOne(cascade = CascadeType.MERGE)
 	 @JoinColumn(name = "id_usuario")
 	 private Usuario usuario;
 	 
 	 
 	 @OneToMany(mappedBy = "deck", fetch=FetchType.EAGER, cascade = CascadeType.MERGE)
-	 private List<Carta> deck_cards = new ArrayList<>();
+	 private List<Carta> deck_cards; 
 	 
 	 private boolean publico;
 	 
@@ -47,6 +47,7 @@ public class Deck {
 		 this.nombre=nombre;
 		 this.formatoMTG=formatoMTG;
 		 this.publico=publico;
+		 this.deck_cards = new ArrayList<>();
 	 }
 
 	public int getId() {
@@ -110,7 +111,7 @@ public class Deck {
 	@Override
 	public String toString() {
 		return "Deck [id=" + id + ", nombre=" + nombre + ", nCartas=" + nCartas + ", formatoMTG=" + formatoMTG
-				+ ", deck_cards=" + deck_cards + ", usuario=" + usuario + "]";
+				+ ", deck_cards=" + deck_cards + ", usuario=" + usuario.getName() + "]";
 	}
 
 }

@@ -48,6 +48,7 @@ import com.dam.Deck_Constructor_TFG.Modelo.Deck;
 import com.dam.Deck_Constructor_TFG.Relaciones.HibernateUtil;
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.MagicCardPDF;
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.MtgApiRequest;
+import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.RecuperarMazosYFav;
 
 
 public class PanelDecks extends JPanel {
@@ -55,7 +56,7 @@ public class PanelDecks extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private PanelEventListener listener;
 	private MtgApiRequest api;
-	JFrame parentFrame;
+	Main_Window parentFrame;
 	JSONArray cardsInicial;
 	private JList<String[]> cardList;
 	private DefaultListModel<String[]> cardListModel;
@@ -70,7 +71,7 @@ public class PanelDecks extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public PanelDecks(JFrame parentFrame) {
+	public PanelDecks(Main_Window parentFrame) {
 		setBackground(colorPrimario);
 		this.parentFrame=parentFrame;
 		setAutoscrolls(true);
@@ -164,6 +165,12 @@ public class PanelDecks extends JPanel {
 		comboBox.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBox.setBounds(0, 11, 346, 22);
 		comboBox.addItem("Eldrazi Incursion DEMO PRUEBA");
+		ArrayList<String> mazos = RecuperarMazosYFav.recuperarMazosUsuario(parentFrame.user);
+		if(mazos != null) {
+			for(String m : mazos) {
+				comboBox.addItem(m);
+			}
+		}
 		panel_CENTER_NORTE.add(comboBox);
 		
 		JButton btnActualizar = new JButton("Actualizar");
@@ -268,8 +275,7 @@ public class PanelDecks extends JPanel {
 		                	ImageIcon cardImage = new ImageIcon(ImageIO.read(new URL(imageUrl)));
 		                    Image originalImage = cardImage.getImage();
 		                    
-		                    // Escalar la imagen manteniendo la proporción
-		                    int scaledWidth = 200; // Ancho deseado
+		                    int scaledWidth = 200; 
 		                    int scaledHeight = (int) (originalImage.getHeight(null) * ((double) scaledWidth / originalImage.getWidth(null)));
 
 		                    Image scaledImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
@@ -325,6 +331,17 @@ public class PanelDecks extends JPanel {
 		                    ImageIcon scaledIcon = new ImageIcon(image);
 
 		                    panelDetalles.lblImagen.setIcon(scaledIcon);
+						    String[] auxMeta = api.getMetadatosCarta(name); 
+						    for(String a : auxMeta) {
+								System.out.println(a);
+							}
+						    panelDetalles.lblcartaInfo.setText(
+						    		"<html><b>Edición: </b>"+auxMeta[0]+
+						    		"<br><br><b>Número de carta: </b>"+auxMeta[1]+
+						    		"<br><br><b>Rareza: </b>"+auxMeta[2]+
+						    		"<br><br><b>Formatos legales: </b>"+auxMeta[3]
+						    		+"</html>"
+						    		);
 		                } catch (MalformedURLException ex) {
 		                    ex.printStackTrace();
 		                }
@@ -352,16 +369,20 @@ public class PanelDecks extends JPanel {
         if (listener != null) {
         	switch(componente) {
         	case "btnFavoritos":
-        		listener.onPanelAction("Favoritos");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Favoritos",parentFrame.user);
         		break;
         	case "btnPrincipal":
-        		listener.onPanelAction("Principal");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Principal",parentFrame.user);
         		break;
         	case "btnSocial":
-        		listener.onPanelAction("Social");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Social",parentFrame.user);
         		break;
         	case "btnLogout":
-        		 listener.onPanelAction("Login");
+        		parentFrame.panelContent.remove(this);
+        		 listener.onPanelAction("Login",parentFrame.user);
         		break;
         	}
            

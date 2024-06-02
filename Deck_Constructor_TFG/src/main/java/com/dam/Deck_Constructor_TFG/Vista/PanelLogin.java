@@ -6,12 +6,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -28,6 +30,8 @@ public class PanelLogin extends JPanel {
 	private PanelEventListener listener;
 	private JTextField txtfUsuario;
 	private JPasswordField passField;
+	Main_Window parent;
+	String user;
 
 	Color colorPrimario = new Color(41, 41, 41); 
 	Color colorPanel = new Color(51, 51, 51);
@@ -36,8 +40,8 @@ public class PanelLogin extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public PanelLogin() {
-		
+	public PanelLogin(Main_Window parent) {
+		this.parent = parent;
 		setBackground(colorPrimario);
 		setBounds(0, 0, 746, 601);
 		setLayout(null);
@@ -58,10 +62,12 @@ public class PanelLogin extends JPanel {
 //		layeredPane.add(panel, JLayeredPane.PALETTE_LAYER);
 		add(panel);
 		JLabel lblUsuario = new JLabel("Usuario:");
+		lblUsuario.setForeground(colorTexto);
 		lblUsuario.setBounds(47, 58, 113, 38);
 		lblUsuario.setFont(new Font("Gabriola", Font.BOLD, 22));
 		
 		JLabel lblContrasenia = new JLabel("Contraseña: ");
+		lblContrasenia.setForeground(colorTexto);
 		lblContrasenia.setBounds(47, 113, 99, 35);
 		lblContrasenia.setFont(new Font("Gabriola", Font.BOLD, 22));
 		
@@ -82,7 +88,8 @@ public class PanelLogin extends JPanel {
 				try {
 					Query query = sis.createQuery("FROM Usuario WHERE name = '"+ txtfUsuario.getText()+"'");
 					Usuario usuario = (Usuario) query.getSingleResult();
-					
+					System.out.println(usuario.getName());
+					user = usuario.getName();
 					if(usuario.getPass().equals(passField.getText())) {
 						actionOccurred();
 					}else {
@@ -106,11 +113,24 @@ public class PanelLogin extends JPanel {
 		btnRegistro.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Session sis = HibernateUtil.getSessionFactory().openSession();
-				Usuario user = new Usuario(txtfUsuario.getText().trim(),passField.getText().trim());
-				
-				sis.beginTransaction();
-				sis.persist(user);
-				sis.getTransaction().commit();
+				Usuario user1 = new Usuario(txtfUsuario.getText().trim(),passField.getText().trim());
+				try {	
+					Query query = sis.createQuery("FROM Usuario WHERE name = '"+ txtfUsuario.getText()+"'");
+					Usuario usuario = (Usuario) query.getSingleResult();
+					JOptionPane.showMessageDialog(null, "El usuario ya está registrado.");
+					
+				}catch(NoResultException e1){
+					sis.beginTransaction();
+					sis.persist(user1);
+					sis.getTransaction().commit();
+					SwingUtilities.invokeLater(() -> {
+			            ToastDialog dialog = new ToastDialog("Usuario '"+txtfUsuario.getText()+"' registrado", 1000);
+			            dialog.mostrarToast();
+			        });
+				}catch (HibernateException e2) {
+					e2.printStackTrace();
+				}
+				sis.close();
 			}
 		});
 		btnRegistro.setVerticalAlignment(SwingConstants.TOP);
@@ -130,7 +150,7 @@ public class PanelLogin extends JPanel {
 	
 	public void actionOccurred() {
         if (listener != null) {
-            listener.onPanelAction("Principal");
+            listener.onPanelAction("Principal",user);
         }
     }
 }

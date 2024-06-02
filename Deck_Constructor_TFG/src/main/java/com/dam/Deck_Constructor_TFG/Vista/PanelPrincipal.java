@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
@@ -19,7 +19,7 @@ import java.net.URL;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -33,6 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.MtgApiRequest;
+import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.PersistenciaCartas;
 
 
 public class PanelPrincipal extends JPanel {
@@ -44,8 +45,9 @@ public class PanelPrincipal extends JPanel {
 	private JTable tablaRegistros;
 	DefaultTableModel model;
 	private MtgApiRequest api;
-	JFrame parentFrame;
+	Main_Window parentFrame;
 	JSONArray cardsInicial;
+	String nomCarta;
 	//Colores
 	Color colorPrimario = new Color(41, 41, 41); 
 	Color colorPanel = new Color(51, 51, 51);
@@ -55,7 +57,7 @@ public class PanelPrincipal extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public PanelPrincipal(JFrame parentFrame) {
+	public PanelPrincipal(Main_Window parentFrame) {
 		setBackground(colorPrimario);
 		this.parentFrame=parentFrame;
 		setAutoscrolls(true);
@@ -126,6 +128,21 @@ public class PanelPrincipal extends JPanel {
 		panel_NORTE.setPreferredSize(new Dimension(500, 80));
 		add(panel_NORTE, BorderLayout.NORTH);
 		panel_NORTE.setLayout(null);
+		
+//		JLabel lblImagenUser = new JLabel("");
+//		lblImagenUser.setPreferredSize(new Dimension(24, 24));
+//		lblImagenUser.setBounds(new Rectangle(0, 0, 24, 24));
+//		lblImagenUser.setIcon(new ImageIcon("C:\\Users\\admin\\Desktop\\icons8-user-24.png"));
+//		lblImagenUser.setBounds(677, 11, 31, 35);
+//		panel_NORTE.add(lblImagenUser);
+		
+		JLabel lblNameUser = new JLabel("");
+		lblNameUser.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lblNameUser.setForeground(colorTexto);
+		lblNameUser.setBounds(705, 21, 84, 14);
+		String aux = parentFrame.user;
+		lblNameUser.setText(aux);
+		panel_NORTE.add(lblNameUser);
 		
 		JPanel panel_CENTER = new JPanel();
 		panel_CENTER.setAutoscrolls(true);
@@ -297,11 +314,11 @@ public class PanelPrincipal extends JPanel {
 		                    int selectedRow = tablaRegistros.getSelectedRow();
 		                    if (selectedRow != -1) {
 		                        // Obtener el nombre de la fila seleccionada
-		                        String name = tablaRegistros.getValueAt(selectedRow, 0).toString();
+		                        nomCarta = tablaRegistros.getValueAt(selectedRow, 0).toString();
 		                        // Actualizar la imagen en el panel de detalles
 		                        URL url;
 		                        try {
-		                        	url = new URL(api.getImagenCarta(name));
+		                        	url = new URL(api.getImagenCarta(nomCarta));
 									ImageIcon icon = new ImageIcon(url);
 									int [] dim = {panelDetalles.lblImagen.getWidth(),panelDetalles.lblImagen.getHeight()};
 								    
@@ -310,7 +327,7 @@ public class PanelPrincipal extends JPanel {
 								    ImageIcon scaledIcon = new ImageIcon(image);
 								    panelDetalles.lblImagen.setIcon(scaledIcon);
 								    //Añadimos el texto de la carta 
-								    String[] auxMeta = api.getMetadatosCarta(name); 
+								    String[] auxMeta = api.getMetadatosCarta(nomCarta); 
 								    for(String a : auxMeta) {
 										System.out.println(a);
 									}
@@ -336,7 +353,29 @@ public class PanelPrincipal extends JPanel {
 		
 		
 		panel_CENTER_CENTER.add(panelDetalles);
-		
+		panelDetalles.actualizarMazos();
+		panelDetalles.btnAddDeck.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String selectedItem = (String) panelDetalles.comboBox.getSelectedItem();
+				if("-Nuevo Deck-".equals(selectedItem)) {
+					DialogNewDeck dialog = new DialogNewDeck(parentFrame, parentFrame.user);
+					dialog.setBackground(colorPrimario);
+					dialog.setForeground(colorTexto);
+					dialog.setVisible(true);  
+					panelDetalles.actualizarMazos();
+				}else {
+					PersistenciaCartas.addCartaMazo(nomCarta, selectedItem);
+				}
+				
+				
+			}
+		});
+		panelDetalles.btnAddFav.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				PersistenciaCartas.addCartaFavoritos(nomCarta, parentFrame.user);
+				
+			}
+		});
 		
 		
 		
@@ -350,19 +389,22 @@ public class PanelPrincipal extends JPanel {
         if (listener != null) {
         	switch(componente) {
         	case "btnMisDecks":
-        		listener.onPanelAction("Mis Decks");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Mis Decks", parentFrame.user);
         		break;
         	case "btnSocial":
-        		listener.onPanelAction("Social");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Social", parentFrame.user);
         		break;
         	case "btnFavoritos":
-        		listener.onPanelAction("Favoritos");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Favoritos",parentFrame.user);
         		break;
         	case "btnLogout":
-        		 listener.onPanelAction("Login");
+        		parentFrame.panelContent.remove(this);
+        		 listener.onPanelAction("Login",parentFrame.user);
         		break;
         	}
         }
     }
-	
 }

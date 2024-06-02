@@ -40,9 +40,9 @@ public class PanelDetallesDeck extends JPanel {
 		setBackground(colorPrimario);
 		lblcartaInfo = new JLabel("");
 		lblcartaInfo.setVerticalAlignment(SwingConstants.TOP);
-		lblcartaInfo.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lblcartaInfo.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblcartaInfo.setForeground(colorTexto);
-		lblcartaInfo.setBounds(49, 433, 413, 210);
+		lblcartaInfo.setBounds(49, 433, 413, 160);
 		add(lblcartaInfo);
 		
 		JButton btnAddFav = new JButton("Añadir a favoritos");
@@ -54,21 +54,21 @@ public class PanelDetallesDeck extends JPanel {
 				
 			}
 		});
-		btnAddFav.setBounds(343, 657, 119, 23);
+		btnAddFav.setBounds(343, 607, 119, 23);
 		add(btnAddFav);
 		
 		Favoritos fav = new Favoritos();
 
-		JButton btnAddDeck = new JButton("Eliminar de deck");
-		btnAddDeck.setBackground(colorBoton);
-		btnAddDeck.setForeground(colorTexto);
-		btnAddDeck.addActionListener(new ActionListener() {
+		JButton btnRMDeck = new JButton("Eliminar de deck");
+		btnRMDeck.setBackground(colorBoton);
+		btnRMDeck.setForeground(colorTexto);
+		btnRMDeck.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
 			}
 		});
-		btnAddDeck.setBounds(112, 607, 119, 23);
-		add(btnAddDeck);
+		btnRMDeck.setBounds(112, 607, 119, 23);
+		add(btnRMDeck);
 		
 		lblImagen = new JLabel("");
 		lblImagen.setBounds(113, 33, 278, 382);

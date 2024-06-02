@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -42,6 +43,10 @@ public class MagicCardPDF {
         // Selección de la ruta del archivo con JFileChooser
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar PDF");
+     // Añadir filtro para archivos PDF
+        FileNameExtensionFilter pdfFilter = new FileNameExtensionFilter("Archivos PDF", "pdf");
+        fileChooser.addChoosableFileFilter(pdfFilter);
+        fileChooser.setFileFilter(pdfFilter); 
         int userSelection = fileChooser.showSaveDialog(null);
 
         if (userSelection == JFileChooser.APPROVE_OPTION) {

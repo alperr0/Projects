@@ -42,13 +42,13 @@ public class PanelSocial extends JPanel {
 	private JTable tablaRegistros;
 	DefaultTableModel model;
 	private MtgApiRequest api;
-	JFrame parentFrame;
+	Main_Window parentFrame;
 	JSONArray cardsInicial;
 
 	/**
 	 * Create the panel.
 	 */
-	public PanelSocial(JFrame parentFrame) {
+	public PanelSocial(Main_Window parentFrame) {
 		this.parentFrame=parentFrame;
 		setAutoscrolls(true);
 		setBounds(0, 0, 1252, 913);
@@ -284,16 +284,20 @@ public class PanelSocial extends JPanel {
         if (listener != null) {
         	switch(componente) {
         	case "btnMisDecks":
-        		listener.onPanelAction("Mis Decks");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Mis Decks",parentFrame.user);
         		break;
         	case "btnPrincipal":
-        		listener.onPanelAction("Principal");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Principal",parentFrame.user);
         		break;
         	case "btnFavoritos":
-        		listener.onPanelAction("Favoritos");
+        		parentFrame.panelContent.remove(this);
+        		listener.onPanelAction("Favoritos",parentFrame.user);
         		break;
         	case "btnLogout":
-        		 listener.onPanelAction("Login");
+        		parentFrame.panelContent.remove(this);
+        		 listener.onPanelAction("Login",parentFrame.user);
         		break;
         	}
         }

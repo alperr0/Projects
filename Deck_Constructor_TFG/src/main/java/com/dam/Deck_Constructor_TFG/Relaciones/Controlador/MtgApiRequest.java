@@ -1,8 +1,7 @@
 package com.dam.Deck_Constructor_TFG.Relaciones.Controlador;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,6 +39,22 @@ public class MtgApiRequest {
             JSONObject jsonResponse = new JSONObject(response.body().string());
             return jsonResponse.getJSONArray("data");
         }
+    }
+	public ArrayList<JSONObject> getFavoritosCards(ArrayList<String> favsCards) throws IOException {
+		ArrayList<JSONObject> cards = new ArrayList<JSONObject>();
+		for(String name : favsCards) {
+			Request req = new Request.Builder()
+					.url("https://api.scryfall.com/cards/named?fuzzy=" + name).build();
+
+	        try (Response response = cliente.newCall(req).execute()) {
+	            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+	            JSONObject jsonResponse = new JSONObject(response.body().string());
+	            cards.add(jsonResponse);
+	        }
+		}
+		return cards;
+		
     }
 	//MÉTODOS
 	public JSONObject getInfoCartas() {
@@ -115,7 +130,6 @@ public class MtgApiRequest {
 		return cardInfo.optString("image_uris");
 	}
 	public String getImagenCarta(String name) {
-		JSONObject jsonImages;
 		Request req = new Request.Builder()
 				.url("https://api.scryfall.com/cards/named?fuzzy=" + name).build();
 		try {
@@ -126,16 +140,21 @@ public class MtgApiRequest {
 
             String responseData = response.body().string();
             cardInfo = new JSONObject(responseData);
-            String docImagenes = cardInfo.optString("image_uris");
-            jsonImages = new JSONObject(docImagenes);
-            return jsonImages.optString("border_crop");
+            JSONObject jsonImagenes;
+			try {
+				jsonImagenes = cardInfo.getJSONObject("image_uris");
+			} catch (Exception e) {
+				JSONArray cardFace = cardInfo.getJSONArray("card_faces");
+				jsonImagenes = cardFace.getJSONObject(0).getJSONObject("image_uris");
+			}
+            return jsonImagenes.optString("border_crop");
         } catch (Exception e) {
             e.printStackTrace();
         }
 		return "https://via.placeholder.com/400x300.png?text=Error+Image";
 	}
 	public String getImagenCartaPng(String name) {
-		JSONObject jsonImages;
+
 		Request req = new Request.Builder()
 				.url("https://api.scryfall.com/cards/named?fuzzy=" + name).build();
 		try {
@@ -146,16 +165,20 @@ public class MtgApiRequest {
 
             String responseData = response.body().string();
             cardInfo = new JSONObject(responseData);
-            String docImagenes = cardInfo.optString("image_uris");
-            jsonImages = new JSONObject(docImagenes);
-            return jsonImages.optString("png");
+            JSONObject jsonImagenes;
+			try {
+				jsonImagenes = cardInfo.getJSONObject("image_uris");
+			} catch (Exception e) {
+				JSONArray cardFace = cardInfo.getJSONArray("card_faces");
+				jsonImagenes = cardFace.getJSONObject(0).getJSONObject("image_uris");
+			}
+            return jsonImagenes.optString("png");
         } catch (Exception e) {
             e.printStackTrace();
         }
 		return "https://via.placeholder.com/400x300.png?text=Error+Image";
 	}
 	public String getImagenCartaSmall(String name) {
-		JSONObject jsonImages;
 		Request req = new Request.Builder()
 				.url("https://api.scryfall.com/cards/named?fuzzy=" + name).build();
 		try {
@@ -166,9 +189,14 @@ public class MtgApiRequest {
 
             String responseData = response.body().string();
             cardInfo = new JSONObject(responseData);
-            String docImagenes = cardInfo.optString("image_uris");
-            jsonImages = new JSONObject(docImagenes);
-            return jsonImages.optString("small");
+            JSONObject jsonImagenes;
+			try {
+				jsonImagenes = cardInfo.getJSONObject("image_uris");
+			} catch (Exception e) {
+				JSONArray cardFace = cardInfo.getJSONArray("card_faces");
+				jsonImagenes = cardFace.getJSONObject(0).getJSONObject("image_uris");
+			}
+            return jsonImagenes.optString("small");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -194,7 +222,6 @@ public class MtgApiRequest {
 
 	            // Edición y número de la carta en la edición
 	            cardData[0] = json.optString("set_name");
-	            String set = json.optString("set_name");
 	            String collectorNumber = json.optString("collector_number");
 	            String setSearchUri = json.getString("set_search_uri");
 	            int totalCardsInSet = getTotalCardsInSet(setSearchUri);

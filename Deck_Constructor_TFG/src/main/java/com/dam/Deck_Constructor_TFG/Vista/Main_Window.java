@@ -4,15 +4,14 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Frame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+
+import com.dam.Deck_Constructor_TFG.Modelo.Usuario;
 
 
 public class Main_Window extends JFrame implements PanelEventListener{
@@ -22,12 +21,13 @@ public class Main_Window extends JFrame implements PanelEventListener{
 	 */
 	private static final long serialVersionUID = 1L;
 	private CardLayout cardLayout;
-	private JPanel panelContent;
+	public JPanel panelContent;
 	private PanelLogin loginPane;
 	private PanelPrincipal mainPane;
 	private PanelDecks decksPane;
 	private PanelFavoritos favPane;
 	private PanelSocial socialPane;
+	String user;
 	Color colorPrimario = new Color(41, 41, 41); 
 	Color colorPanel = new Color(51, 51, 51);
 	Color colorBoton = new Color(34, 34, 34); 
@@ -78,7 +78,7 @@ public class Main_Window extends JFrame implements PanelEventListener{
 			e.printStackTrace();
 		}
 		
-		loginPane = new PanelLogin();
+		loginPane = new PanelLogin(this);
 		loginPane.setBackground(colorPrimario);
 		loginPane.setPanelActionListener(this);
 		
@@ -100,13 +100,20 @@ public class Main_Window extends JFrame implements PanelEventListener{
 	}
 
 	@Override
-	public void onPanelAction(String panelName) {
+	public void onPanelAction(String panelName, String user) {
 		Dimension newSize;
 		switch(panelName) {
 		case "Login":
+			System.gc();
+			setBounds(100, 100, 762, 640);
+			setLocationRelativeTo(null);
+			panelContent.setBounds(0, 0, 746, 601);
 			setResizable(false);
+			panelContent.add("Login", loginPane);
+			cardLayout.show(panelContent, panelName);
 			break;
 		case "Principal":
+			System.gc();
 			mainPane = new PanelPrincipal(this);
 			mainPane.setPanelActionListener(this);
 			panelContent.add("Principal", mainPane);
@@ -115,8 +122,10 @@ public class Main_Window extends JFrame implements PanelEventListener{
 			newSize = getSize(); // Obtenemos las nuevas dimensiones del JFrame
             panelContent.setSize(newSize); // Establecemos las mismas dimensiones en el panelContent
             setResizable(true);
+            this.user=user;
 			break;
 		case "Mis Decks":
+			System.gc();
 			System.out.println("Cambia mis decks");
 			decksPane = new PanelDecks(this);
     		decksPane.setPanelActionListener(this);
@@ -128,6 +137,7 @@ public class Main_Window extends JFrame implements PanelEventListener{
             
 			break;
 		case "Favoritos":
+			System.gc();
 			favPane = new PanelFavoritos(this);
 			favPane.setPanelActionListener(this);
 			panelContent.add(panelName, favPane);
@@ -138,6 +148,7 @@ public class Main_Window extends JFrame implements PanelEventListener{
 			break;
 			
 		case "Social":
+			System.gc();
 			socialPane = new PanelSocial(this);
 			socialPane.setPanelActionListener(this);
 			panelContent.add(panelName, socialPane );
