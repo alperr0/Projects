@@ -27,9 +27,11 @@ public class Carta {
 	@JoinColumn(name = "id_deck")
 	private Deck deck;
 	
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_favs")
     private Favoritos favoritos;
+	
+	private short nCopias;
 	
 	public Carta() {
 		
@@ -70,6 +72,15 @@ public class Carta {
 	public void setFavoritos(Favoritos favoritos) {
 		this.favoritos = favoritos;
 	}
+
+	public short getnCopias() {
+		return nCopias;
+	}
+
+	public void setnCopias(short nCopias) {
+		this.nCopias = nCopias;
+	}
+	
 	
 	
 }

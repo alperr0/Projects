@@ -34,6 +34,7 @@ import org.json.JSONObject;
 
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.MtgApiRequest;
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.PersistenciaCartas;
+import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.RecuperarMazosYFav;
 
 
 public class PanelPrincipal extends JPanel {
@@ -292,6 +293,8 @@ public class PanelPrincipal extends JPanel {
                 return false; // Hacer todas las celdas no editables
             }
         };
+        tablaRegistros.setOpaque(true);
+		tablaRegistros.setFillsViewportHeight(true);
 		tablaRegistros.setSelectionForeground(colorTexto);
 		tablaRegistros.setForeground(colorTexto);
 		tablaRegistros.setSelectionBackground(colorBoton);
@@ -304,48 +307,50 @@ public class PanelPrincipal extends JPanel {
 		panelDetalles.setPreferredSize(new Dimension(350, 800));
 		
 		JScrollPane scrollPane = new JScrollPane(tablaRegistros);
-		scrollPane.setBackground(new Color(128, 64, 0));
+		tablaRegistros.getTableHeader().setBackground(colorPanel);
+		scrollPane.setBackground(colorPanel);
+		scrollPane.setForeground(colorPanel);
 		scrollPane.setPreferredSize(new Dimension(451, 302));
 		
-				tablaRegistros.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-		            @Override
-		            public void valueChanged(ListSelectionEvent e) {
-		                if (!e.getValueIsAdjusting()) { // Verificar si la selección ha terminado de cambiar
-		                    int selectedRow = tablaRegistros.getSelectedRow();
-		                    if (selectedRow != -1) {
-		                        // Obtener el nombre de la fila seleccionada
-		                        nomCarta = tablaRegistros.getValueAt(selectedRow, 0).toString();
-		                        // Actualizar la imagen en el panel de detalles
-		                        URL url;
-		                        try {
-		                        	url = new URL(api.getImagenCarta(nomCarta));
-									ImageIcon icon = new ImageIcon(url);
-									int [] dim = {panelDetalles.lblImagen.getWidth(),panelDetalles.lblImagen.getHeight()};
-								    
-								    Image image = icon.getImage().getScaledInstance(dim[0], dim[1], Image.SCALE_SMOOTH);
-								    
-								    ImageIcon scaledIcon = new ImageIcon(image);
-								    panelDetalles.lblImagen.setIcon(scaledIcon);
-								    //Añadimos el texto de la carta 
-								    String[] auxMeta = api.getMetadatosCarta(nomCarta); 
-								    for(String a : auxMeta) {
-										System.out.println(a);
-									}
-								    panelDetalles.lblcartaInfo.setText(
-								    		"<html><b>Edición: </b>"+auxMeta[0]+
-								    		"<br><br><b>Número de carta: </b>"+auxMeta[1]+
-								    		"<br><br><b>Rareza: </b>"+auxMeta[2]+
-								    		"<br><br><b>Formatos legales: </b>"+auxMeta[3]
-								    		+"</html>"
-								    		);
-		                        } catch (MalformedURLException ex) {
-		                            ex.printStackTrace();
-		                        }
-		                        
-		                    }
-		                }
-		            }
-		        });
+		tablaRegistros.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) { // Verificar si la selección ha terminado de cambiar
+                    int selectedRow = tablaRegistros.getSelectedRow();
+                    if (selectedRow != -1) {
+                        // Obtener el nombre de la fila seleccionada
+                        nomCarta = tablaRegistros.getValueAt(selectedRow, 0).toString();
+                        // Actualizar la imagen en el panel de detalles
+                        URL url;
+                        try {
+                        	url = new URL(api.getImagenCarta(nomCarta));
+							ImageIcon icon = new ImageIcon(url);
+							int [] dim = {panelDetalles.lblImagen.getWidth(),panelDetalles.lblImagen.getHeight()};
+						    
+						    Image image = icon.getImage().getScaledInstance(dim[0], dim[1], Image.SCALE_SMOOTH);
+						    
+						    ImageIcon scaledIcon = new ImageIcon(image);
+						    panelDetalles.lblImagen.setIcon(scaledIcon);
+						    //Añadimos el texto de la carta 
+						    String[] auxMeta = api.getMetadatosCarta(nomCarta); 
+						    for(String a : auxMeta) {
+								System.out.println(a);
+							}
+						    panelDetalles.lblcartaInfo.setText(
+						    		"<html><b>Edición: </b>"+auxMeta[0]+
+						    		"<br><br><b>Número de carta: </b>"+auxMeta[1]+
+						    		"<br><br><b>Rareza: </b>"+auxMeta[2]+
+						    		"<br><br><b>Formatos legales: </b>"+auxMeta[3]
+						    		+"</html>"
+						    		);
+                        } catch (MalformedURLException ex) {
+                            ex.printStackTrace();
+                        }
+                        
+                    }
+                }
+            }
+        });
 		panel_CENTER_CENTER.setLayout(new GridLayout(0, 2, 0, 0));
 		scrollPane.setAutoscrolls(true);
 		panel_CENTER_CENTER.add(scrollPane);
@@ -367,13 +372,13 @@ public class PanelPrincipal extends JPanel {
 					PersistenciaCartas.addCartaMazo(nomCarta, selectedItem);
 				}
 				
-				
 			}
 		});
+		
 		panelDetalles.btnAddFav.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				RecuperarMazosYFav.initFavs(parentFrame.user);
 				PersistenciaCartas.addCartaFavoritos(nomCarta, parentFrame.user);
-				
 			}
 		});
 		

@@ -20,13 +20,14 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 
 public class MagicCardPDF {
-	public static void crearPDF (ArrayList<String> cardNames) {
+	public static void crearPDF (ArrayList<String[]> cardNames) {
 		 // URL de las imágenes de las cartas
-        ArrayList<String> cardImages = new ArrayList<String>();
+        ArrayList<String[]> cardInfo = new ArrayList<String[]>();
         MtgApiRequest api = MtgApiRequest.getInstance();
-        for (String c : cardNames) {
-            String urlImagen = api.getImagenCartaPng(c);
-            cardImages.add(urlImagen);
+        for (String[] c : cardNames) {
+            String urlImagen = api.getImagenCartaPng(c[0]);
+            String nCopias= c[1];
+            cardInfo.add(new String[] {urlImagen, nCopias});
         }
 
      // Dimensiones de una carta Magic en puntos (1 pulgada = 72 puntos)
@@ -68,12 +69,12 @@ public class MagicCardPDF {
                 // Contador de cartas
                 int i = 0;
 
-                while (i < cardImages.size()) {
+                while (i < cardInfo.size()) {
                     // Agregar una nueva página
                     document.newPage();
 
                     // Reiniciar el contador de cartas para la nueva página
-                    i = addCardsToPage(document, writer, cardImages, i, filas, columnas, anchoCartaPulgadas, alturaCartaPulgadas, marginLeftRight, marginTopBottom);
+                    i = addCardsToPage(document, writer, cardInfo, i, filas, columnas, anchoCartaPulgadas, alturaCartaPulgadas, marginLeftRight, marginTopBottom);
                 }
 
                 // Cerrar el documento
@@ -87,33 +88,46 @@ public class MagicCardPDF {
             }
         }
     }
-	private static int addCardsToPage(Document document, PdfWriter writer, ArrayList<String> cardImages, int startingIndex, int cardsPerRow, int cardsPerColumn, float cardWidthPoints, float cardHeightPoints, float marginLeftRight, float marginTopBottom) throws DocumentException, IOException {
-	    int cardCounter = startingIndex;
+	private static int addCardsToPage(Document document, PdfWriter writer, ArrayList<String[]> cardInfo, int startingIndex, int cardsPerRow, int cardsPerColumn, float cardWidthPoints, float cardHeightPoints, float marginLeftRight, float marginTopBottom) throws DocumentException, IOException {
+        int cardCounter = startingIndex;
+        int currentRow = 0;
+        int currentCol = 0;
 
-	    for (int row = 0; row < cardsPerColumn && cardCounter < cardImages.size(); row++) {
-	        for (int col = 0; col < cardsPerRow && cardCounter < cardImages.size(); col++) {
-	            String imageUrl = cardImages.get(cardCounter);
+        while (currentRow < cardsPerColumn && cardCounter < cardInfo.size()) {
+            String imageUrl = cardInfo.get(cardCounter)[0];
+            int nCopias = Integer.parseInt(cardInfo.get(cardCounter)[1]);
 
-	            // Cargar imagen desde la URL
-	            BufferedImage bufferedImage = ImageIO.read(new URL(imageUrl));
-	            Image image = Image.getInstance(bufferedImage, null);
+            for (int copy = 0; copy < nCopias; copy++) {
+                // Cargar imagen desde la URL
+                BufferedImage bufferedImage = ImageIO.read(new URL(imageUrl));
+                Image image = Image.getInstance(bufferedImage, null);
 
-	            // Escalar imagen al tamaño real de la carta
-	            image.scaleAbsolute(cardWidthPoints, cardHeightPoints);
+                // Escalar imagen al tamaño real de la carta
+                image.scaleAbsolute(cardWidthPoints, cardHeightPoints);
 
-	            // Coordenadas absolutas para cada carta
-	            float x = marginLeftRight + col * cardWidthPoints;
-	            float y = marginTopBottom + (2 * cardHeightPoints) - (row * cardHeightPoints);
-	            image.setAbsolutePosition(x, y);
+                // Coordenadas absolutas para cada carta
+                float x = marginLeftRight + currentCol * cardWidthPoints;
+                float y = marginTopBottom + (2 * cardHeightPoints) - (currentRow * cardHeightPoints);
+                image.setAbsolutePosition(x, y);
 
-	            // Agregar imagen al documento
-	            document.add(image);
+                // Agregar imagen al documento
+                document.add(image);
 
-	            cardCounter++;
-	        }
-	    }
-
-	    return cardCounter;
-	}
+                // Actualizar las coordenadas para la próxima carta
+                currentCol++;
+                if (currentCol == cardsPerRow) {
+                    currentCol = 0;
+                    currentRow++;
+                    if (currentRow == cardsPerColumn) {
+                        // Si hemos llenado la página, actualizar el índice y romper el bucle para agregar una nueva página
+                        cardCounter++;
+                        return cardCounter;
+                    }
+                }
+            }
+            cardCounter++;
+        }
+        return cardCounter;
+    }
  }
 

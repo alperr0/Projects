@@ -4,8 +4,10 @@ package com.dam.Deck_Constructor_TFG.Modelo;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,13 +29,13 @@ public class Favoritos {
 	@JoinColumn(name = "id_usuario")
     private Usuario usuario;
 	
-	@OneToMany(mappedBy = "favoritos")
+	@OneToMany(mappedBy = "favoritos",fetch=FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     private List<Carta> fav_cards = new ArrayList<>();
 	
 	public Favoritos() {
 		
 	}
-
+	 
 	public Favoritos(List<Carta> fav_cards) {
 		this.fav_cards = fav_cards;
 	}

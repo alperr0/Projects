@@ -11,7 +11,6 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,24 +19,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.ListCellRenderer;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -47,7 +39,9 @@ import com.dam.Deck_Constructor_TFG.Modelo.Carta;
 import com.dam.Deck_Constructor_TFG.Modelo.Deck;
 import com.dam.Deck_Constructor_TFG.Relaciones.HibernateUtil;
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.MagicCardPDF;
+import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.ModificarCarta;
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.MtgApiRequest;
+import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.PersistenciaCartas;
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.RecuperarMazosYFav;
 
 
@@ -62,7 +56,11 @@ public class PanelDecks extends JPanel {
 	private DefaultListModel<String[]> cardListModel;
 	private String nombreDeckActual;
 	String urlImagen;
+	Map<String, ImageIcon> imageCache;
 	ArrayList<String> cardNames;
+	ArrayList<String[]> deckCards;
+	String nomMazo;
+	String name;
 	Color colorPrimario = new Color(41, 41, 41); 
 	Color colorPanel = new Color(51, 51, 51);
 	Color colorBoton = new Color(34, 34, 34); 
@@ -173,21 +171,15 @@ public class PanelDecks extends JPanel {
 		}
 		panel_CENTER_NORTE.add(comboBox);
 		
-		JButton btnActualizar = new JButton("Actualizar");
-		btnActualizar.setBackground(colorBoton);
-		btnActualizar.setForeground(colorTexto);
-		btnActualizar.setBounds(356, 13, 89, 23);
-		panel_CENTER_NORTE.add(btnActualizar);
-		
-		JButton btnProxiesPDF = new JButton("Generar proxies PDF");
+		JButton btnProxiesPDF = new JButton("Generar mazo PDF");
 		btnProxiesPDF.setBackground(colorBoton);
 		btnProxiesPDF.setForeground(colorTexto);
 		btnProxiesPDF.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MagicCardPDF.crearPDF(cardNames);
+				MagicCardPDF.crearPDF(deckCards);
 			}
 		});
-		btnProxiesPDF.setBounds(467, 13, 89, 23);
+		btnProxiesPDF.setBounds(419, 13, 137, 23);
 		panel_CENTER_NORTE.add(btnProxiesPDF);
 			
 	
@@ -233,75 +225,84 @@ public class PanelDecks extends JPanel {
 		sis.close();
 		
 		//PANEL CARTAS DECK
-				MtgApiRequest api = MtgApiRequest.getInstance();
-				cardListModel = new DefaultListModel<>();
-				//ArrayList<String> cardNames = RecuperarCartasDB.getDeckByName(nombreDeckActual);
-				cardNames = new ArrayList<>(Arrays.asList(
-					    "Ulalek, Fused Atrocity",
-					    "Drowner of Hope",
-					    "Morophon, the Boundless",
-					    "Void Winnower",
-					    "Ugin, the Ineffable",
-					    "Eldrazi Monument",
-					    "Forsaken Monument",
-					    "Crib Swap",
-					    "Forest",
-					    "Island",
-					    "Mountain",
-					    "Plains",
-					    "Swamp"
-					));
-				for(String c : cardNames) {
-					urlImagen = api.getImagenCartaSmall(c);
-					cardListModel.addElement(new String[]{c, urlImagen});
-				}
-				cardList = new JList<>(cardListModel);
-				cardList.setSelectionForeground(colorTexto);
-				cardList.setForeground(colorTexto);
-				cardList.setSelectionBackground(colorBoton);
-				cardList.setBackground(colorPanel);
-				cardList.setCellRenderer(new ListCellRenderer<>() {
-		            private JLabel lblImage = new JLabel();
-		            SpinnerModel spinnerModel = new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1); // Valor inicial, mínimo, máximo, paso
-		            JSpinner spinner = new JSpinner(spinnerModel);
+		MtgApiRequest api = MtgApiRequest.getInstance();
+		cardListModel = new DefaultListModel<>();
+		//ArrayList<String> cardNames = RecuperarCartasDB.getDeckByName(nombreDeckActual);
+		cardNames = new ArrayList<>(Arrays.asList(
+			    "Ulalek, Fused Atrocity",
+			    "Drowner of Hope",
+			    "Morophon, the Boundless",
+			    "Void Winnower",
+			    "Ugin, the Ineffable",
+			    "Eldrazi Monument",
+			    "Forsaken Monument",
+			    "Crib Swap",
+			    "Forest",
+			    "Island",
+			    "Mountain",
+			    "Plains",
+			    "Swamp"
+			));
+		// Cargar las imágenes y almacenarlas en caché
+		imageCache = new HashMap<>();
+		for (String c : cardNames) {
+		    String urlImagen = api.getImagenCarta(c);
+		    try {
+		        ImageIcon cardImage = new ImageIcon(ImageIO.read(new URL(urlImagen)));
+		        // Escalar la imagen
+		        int scaledWidth = 200;
+		        int scaledHeight = (int) ((double) cardImage.getIconHeight() * scaledWidth / cardImage.getIconWidth());
+		        Image scaledImage = cardImage.getImage().getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+		        ImageIcon scaledIcon = new ImageIcon(scaledImage);
+		        imageCache.put(urlImagen, scaledIcon); // Almacenar la imagen escalada en caché
+		    } catch (IOException e) {
+		        e.printStackTrace();
+		        // Manejar errores de carga de imágenes si es necesario
+		    }
+		    cardListModel.addElement(new String[]{c, urlImagen, "1"}); // Agregar los datos al modelo de lista de cartas
+		}
 
-		            @Override
-		            public Component getListCellRendererComponent(JList<? extends String[]> list, String[] cardData, int index, boolean isSelected, boolean cellHasFocus) {
-		                String nombre = cardData[0];
-		                String imageUrl = cardData[1];
+		cardList = new JList<>(cardListModel);
+		cardList.setSelectionForeground(colorTexto);
+		cardList.setForeground(colorTexto);
+		cardList.setSelectionBackground(colorBoton);
+		cardList.setBackground(colorPanel);
+		cardList.setCellRenderer(new ListCellRenderer<>() {
+		    private JLabel lblImage = new JLabel();
+		    private JLabel lblnCopias = new JLabel();
 
-		                JPanel panel = new JPanel(new BorderLayout(10, 10));
-		                try {
-		                	ImageIcon cardImage = new ImageIcon(ImageIO.read(new URL(imageUrl)));
-		                    Image originalImage = cardImage.getImage();
-		                    
-		                    int scaledWidth = 200; 
-		                    int scaledHeight = (int) (originalImage.getHeight(null) * ((double) scaledWidth / originalImage.getWidth(null)));
+		    @Override
+		    public Component getListCellRendererComponent(JList<? extends String[]> list, String[] cardData, int index, boolean isSelected, boolean cellHasFocus) {
+		        String nombre = cardData[0];
+		        String imageUrl = cardData[1];
 
-		                    Image scaledImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
-		                    lblImage.setIcon(new ImageIcon(scaledImage));
-		                } catch (IOException e) {
-		                    e.printStackTrace();
-		                    lblImage.setIcon(null);
-		                }
+		        ImageIcon cachedImage = imageCache.get(imageUrl); // Obtener la imagen de la caché
+		        lblImage.setIcon(cachedImage); // Establecer la imagen en el JLabel
+		        lblnCopias.setText("x"+cardData[2]);
+		        lblnCopias.setForeground(colorTexto);
+		        lblnCopias.setFont(new Font("Tahoma", Font.BOLD, 14));
+		        lblnCopias.setAlignmentX(CENTER_ALIGNMENT);
+		        lblnCopias.setAlignmentY(TOP_ALIGNMENT);
+		        JPanel panel = new JPanel(new BorderLayout(10, 10));
+		        panel.add(lblImage, BorderLayout.CENTER);
+		        panel.add(lblnCopias, BorderLayout.SOUTH);
 
-		                panel.add(lblImage, BorderLayout.CENTER);
-		                panel.add(spinner, BorderLayout.SOUTH);
 
-		                if (isSelected) {
-		                    panel.setBackground(list.getSelectionBackground());
-		                    panel.setForeground(list.getSelectionForeground());
-		                } else {
-		                    panel.setBackground(list.getBackground());
-		                    panel.setForeground(list.getForeground());
-		                }
+		        if (isSelected) {
+		            panel.setBackground(list.getSelectionBackground());
+		            panel.setForeground(list.getSelectionForeground());
+		        } else {
+		            panel.setBackground(list.getBackground());
+		            panel.setForeground(list.getForeground());
+		        }
 
-		                return panel;
-		            }
-		        });
+		        return panel;
+		    }
+		    
+		});
 
-		        cardList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-		        cardList.setVisibleRowCount(-1);
+        cardList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        cardList.setVisibleRowCount(-1);
 		////
 		PanelDetallesDeck panelDetalles = new PanelDetallesDeck(parentFrame);
 		panelDetalles.setMinimumSize(new Dimension(100, 0));
@@ -319,8 +320,9 @@ public class PanelDecks extends JPanel {
 		            if (selectedIndex != -1) {
 		                // Obtener el nombre de la carta seleccionada
 		                String[] selectedCardData = cardList.getSelectedValue();
-		                String name = selectedCardData[0]; // Nombre de la carta
+		                name = selectedCardData[0]; // Nombre de la carta
 		                String imageUrl = selectedCardData[1]; // URL de la imagen
+		                String nCopias = selectedCardData[2];
 		                
 		                // Actualizar la imagen en el panel de detalles
 		                try {
@@ -331,6 +333,8 @@ public class PanelDecks extends JPanel {
 		                    ImageIcon scaledIcon = new ImageIcon(image);
 
 		                    panelDetalles.lblImagen.setIcon(scaledIcon);
+		                    panelDetalles.textField.setText(selectedCardData[2]);
+		                    
 						    String[] auxMeta = api.getMetadatosCarta(name); 
 						    for(String a : auxMeta) {
 								System.out.println(a);
@@ -345,21 +349,87 @@ public class PanelDecks extends JPanel {
 		                } catch (MalformedURLException ex) {
 		                    ex.printStackTrace();
 		                }
+		                
 		            }
 		        }
 		    }
+		   
 		});
+		
+		comboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	JComboBox<?> combo = (JComboBox<?>) e.getSource();
+                nomMazo = (String) combo.getItemAt(combo.getSelectedIndex());
+                recuperarYReferescarMazo(parentFrame, api);
+                
+            }
+
+			
+        });
 		scrollPane.setAutoscrolls(true);
 		panel_CENTER_CENTER.add(scrollPane);
 		
 		
 		
 		panel_CENTER_CENTER.add(panelDetalles);
-		
-		
-		
-		
+		 panelDetalles.btnSumar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				short nCopias = Short.parseShort(panelDetalles.textField.getText());
+				nCopias++;
+				panelDetalles.textField.setText(String.valueOf(nCopias));
+		        ModificarCarta.cambiarCopiasCarta(parentFrame.user, nomMazo, name, nCopias);
+		        recuperarYReferescarMazo(parentFrame, api);
+			}
+		});
+         
+		 panelDetalles.btnRestar.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					short nCopias = Short.parseShort(panelDetalles.textField.getText());
+					if(nCopias>1) {
+						nCopias--;
+						panelDetalles.textField.setText(String.valueOf(nCopias));
+				        ModificarCarta.cambiarCopiasCarta(parentFrame.user, nomMazo, name, nCopias);
+				        recuperarYReferescarMazo(parentFrame, api);
+					}
+				}
+			});
+		 panelDetalles.btnRMDeck.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					RecuperarMazosYFav.borrarCartaMazo(parentFrame.user, nomMazo, name);
+					recuperarYReferescarMazo(parentFrame, api);
+				}
+			});
+		 panelDetalles.btnAddFav.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					RecuperarMazosYFav.initFavs(parentFrame.user);
+					PersistenciaCartas.addCartaFavoritos(name, parentFrame.user);
+					
+				}
+			});
 
+	}
+	private void recuperarYReferescarMazo(Main_Window parentFrame, MtgApiRequest api) {
+		deckCards = RecuperarMazosYFav.recuperarCartasMazo(parentFrame.user, nomMazo);
+        cardListModel.clear();
+        
+        for (String[] card : deckCards) {
+		    String urlImagen = api.getImagenCarta(card[0]);
+		    try {
+		        ImageIcon cardImage = new ImageIcon(ImageIO.read(new URL(urlImagen)));
+		        // Escalar la imagen
+		        int scaledWidth = 200;
+		        int scaledHeight = (int) ((double) cardImage.getIconHeight() * scaledWidth / cardImage.getIconWidth());
+		        Image scaledImage = cardImage.getImage().getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+		        ImageIcon scaledIcon = new ImageIcon(scaledImage);
+		        imageCache.put(urlImagen, scaledIcon); // Almacenar la imagen escalada en caché
+		    } catch (IOException ioe) {
+		        ioe.printStackTrace();
+		        // Manejar errores de carga de imágenes si es necesario
+		    }
+		    cardListModel.addElement(new String[]{card[0], urlImagen, card[1]}); // Agregar los datos al modelo de lista de cartas
+		}
 	}
 	public void setPanelActionListener(PanelEventListener listener) {
 		this.listener=listener;
@@ -388,5 +458,6 @@ public class PanelDecks extends JPanel {
            
         }
     }
+	
 	
 }
