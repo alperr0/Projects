@@ -68,7 +68,7 @@ public class PanelFavoritos extends JPanel {
 		panel_IZQ.setPreferredSize(new Dimension(150, 10));
 		add(panel_IZQ, BorderLayout.WEST);
 		
-		JButton btnMisDecks = new JButton("Mis decks");
+		JButton btnMisDecks = new JButton("Mazos");
 		btnMisDecks.setBackground(colorBoton);
 		btnMisDecks.setForeground(colorTexto);
 		btnMisDecks.setMargin(new Insets(2, 20, 2, 20));
@@ -83,6 +83,18 @@ public class PanelFavoritos extends JPanel {
 		panel.setBackground(colorPrimario);
 		panel.setPreferredSize(new Dimension(140, 50));
 		panel_IZQ.add(panel);
+		
+		JButton btnPrincipal = new JButton("Principal");
+		btnPrincipal.setPreferredSize(new Dimension(120, 40));
+		btnPrincipal.setBackground(colorBoton);
+		btnPrincipal.setForeground(colorTexto);
+		btnPrincipal.setMargin(new Insets(2, 20, 2, 20));
+		btnPrincipal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionOccurred("btnPrincipal");
+			}
+		});
+		panel_IZQ.add(btnPrincipal);
 		btnMisDecks.setPreferredSize(new Dimension(120, 40));
 		panel_IZQ.add(btnMisDecks);
 		
@@ -98,19 +110,7 @@ public class PanelFavoritos extends JPanel {
 		btnFavoritos.setPreferredSize(new Dimension(120, 40));
 		panel_IZQ.add(btnFavoritos);
 		
-		JButton btnSocial = new JButton("Social");
-		btnSocial.setBackground(colorBoton);
-		btnSocial.setForeground(colorTexto);
-		btnSocial.setMargin(new Insets(2, 20, 2, 20));
-		btnSocial.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				actionOccurred("btnSocial");
-			}
-		});
-		btnSocial.setPreferredSize(new Dimension(120, 40));
-		panel_IZQ.add(btnSocial);
-		
-		JButton btnLogout = new JButton("Log out");
+		JButton btnLogout = new JButton("Salir");
 		btnLogout.setBackground(colorBoton);
 		btnLogout.setForeground(colorTexto);
 		btnLogout.setPreferredSize(new Dimension(120, 40));
@@ -147,6 +147,7 @@ public class PanelFavoritos extends JPanel {
 		panel_CENTER.add(panel_CENTER_CENTER, BorderLayout.CENTER);
 		
 		textFetchbar = new JTextField();
+		textFetchbar.setVisible(false);
 		textFetchbar.setBounds(73, 11, 338, 20);
 		panel_CENTER_NORTE.add(textFetchbar);
 		textFetchbar.setPreferredSize(new Dimension(50, 20));
@@ -162,6 +163,7 @@ public class PanelFavoritos extends JPanel {
 		recuperarYRefrescarFavs(parentFrame);
 
 		JButton btnBuscar = new JButton("Buscar");
+		btnBuscar.setVisible(false);
 		btnBuscar.setBackground(colorBoton);
 		btnBuscar.setForeground(colorTexto);
 		btnBuscar.addActionListener(new ActionListener() {
@@ -226,6 +228,19 @@ public class PanelFavoritos extends JPanel {
 		panelBotones.add(btnDerecha);
 		panel_CENTER.add(panelBotones, BorderLayout.SOUTH);
 		panel_CENTER_CENTER.setLayout(new GridLayout(0, 2, 0, 0));
+		
+		JButton btnSocial = new JButton("Social");
+		btnSocial.setVisible(false);
+		btnSocial.setBackground(colorBoton);
+		btnSocial.setForeground(colorTexto);
+		btnSocial.setMargin(new Insets(2, 20, 2, 20));
+		btnSocial.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionOccurred("btnSocial");
+			}
+		});
+		btnSocial.setPreferredSize(new Dimension(120, 40));
+		panel_IZQ.add(btnSocial);
 		
 		JPanel panelRelleno = new JPanel();
 		panelRelleno.setBackground(colorPrimario);

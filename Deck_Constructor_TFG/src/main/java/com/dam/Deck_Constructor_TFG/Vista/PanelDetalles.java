@@ -50,7 +50,7 @@ public class PanelDetalles extends JPanel {
 		lblcartaInfo.setVerticalAlignment(SwingConstants.TOP);
 		lblcartaInfo.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblcartaInfo.setForeground(colorTexto);
-		lblcartaInfo.setBounds(49, 433, 413, 160);
+		lblcartaInfo.setBounds(49, 386, 413, 160);
 		add(lblcartaInfo);
 		
 		btnAddFav = new JButton("Añadir a favoritos");
@@ -85,7 +85,7 @@ public class PanelDetalles extends JPanel {
 		add(btnAddDeck);
 		
 		lblImagen = new JLabel("");
-		lblImagen.setBounds(113, 33, 278, 382);
+		lblImagen.setBounds(113, 33, 246, 346);
 		add(lblImagen);
 
 	}

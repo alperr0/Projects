@@ -16,6 +16,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+    <hibernate.cfg.xml>src/main/resources/hibernate.cfg.xml</hibernate.cfg.xml>
   </properties>
 
   <dependencies>
@@ -73,7 +74,18 @@
 	    <artifactId>itextpdf</artifactId>
 	    <version>5.5.13.3</version>
 	</dependency>
-		
+	<!-- https://mvnrepository.com/artifact/org.jfree/jcommon -->
+	<dependency>
+	    <groupId>org.jfree</groupId>
+	    <artifactId>jcommon</artifactId>
+	    <version>1.0.24</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
+	<dependency>
+	    <groupId>org.jfree</groupId>
+	    <artifactId>jfreechart</artifactId>
+	    <version>1.0.19</version>
+	</dependency>
   </dependencies>
   <build>
     <plugins>
@@ -84,4 +96,5 @@
       </plugin>
     </plugins>
   </build>
+  
 </project>

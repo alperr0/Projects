@@ -111,6 +111,8 @@ public class Main_Window extends JFrame implements PanelEventListener{
 			setResizable(false);
 			panelContent.add("Login", loginPane);
 			cardLayout.show(panelContent, panelName);
+			loginPane.txtfUsuario.setText("");
+			loginPane.passField.setText("");
 			break;
 		case "Principal":
 			System.gc();

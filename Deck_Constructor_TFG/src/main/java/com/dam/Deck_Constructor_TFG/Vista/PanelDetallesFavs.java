@@ -50,7 +50,7 @@ public class PanelDetallesFavs extends JPanel {
 		lblcartaInfo.setVerticalAlignment(SwingConstants.TOP);
 		lblcartaInfo.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblcartaInfo.setForeground(colorTexto);
-		lblcartaInfo.setBounds(40, 390, 413, 160);
+		lblcartaInfo.setBounds(49, 386, 413, 160);
 		add(lblcartaInfo);
 		
 		btnRMFav = new JButton("Eliminar carta");

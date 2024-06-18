@@ -48,6 +48,39 @@ public class PersistenciaCartas {
 		sis.close();
 		
 	}
+	public static void addCartaMazoSilence(String nomCarta, String deckName) {
+		var sis = HibernateUtil.getSessionFactory().openSession();
+
+		String hql = "SELECT d FROM Deck d WHERE d.nombre = :deckName";
+		Deck deck = sis.createQuery(hql, Deck.class)
+		        .setParameter("deckName", deckName)
+		        .getSingleResult();
+
+		boolean cartaExiste = deck.getDeck_cards().stream()
+		                          .anyMatch(card -> card.getNombre().equals(nomCarta));
+
+		if (cartaExiste) {
+			SwingUtilities.invokeLater(() -> {
+	            ToastDialog dialog = new ToastDialog("'"+nomCarta+"' ya fue añadida a '"+deckName+"'", 1000);
+	            dialog.mostrarToast();
+	        });
+		} else {
+		    // Crear y añadir la nueva carta al mazo
+		    Carta c = new Carta(nomCarta);
+		    c.setnCopias((short) 1);
+		    c.setDeck(deck);
+		    deck.getDeck_cards().add(c);
+
+		    sis.beginTransaction();
+		    sis.merge(c);
+		    sis.merge(deck);
+		    sis.getTransaction().commit();
+		    
+		}
+
+		sis.close();
+		
+	}
 	
 	public static void addCartaFavoritos(String nomCarta, String user) {
 		var sis = HibernateUtil.getSessionFactory().openSession();

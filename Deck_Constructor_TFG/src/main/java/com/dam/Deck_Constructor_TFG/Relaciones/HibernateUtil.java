@@ -1,9 +1,11 @@
 package com.dam.Deck_Constructor_TFG.Relaciones;
 
-import org.hibernate.*;
+import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.*;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+
 
 
 public class HibernateUtil {
@@ -14,6 +16,7 @@ public class HibernateUtil {
         if (sessionFactory == null) {
             try {
                 // Create registry
+
                 registry = new StandardServiceRegistryBuilder().configure().build();
 
                 // Create MetadataSources
@@ -24,7 +27,7 @@ public class HibernateUtil {
                 Metadata metadata = sources.getMetadataBuilder().build();
 
                 // Create SessionFactory
-                sessionFactory = metadata.getSessionFactoryBuilder().build();
+               sessionFactory = metadata.getSessionFactoryBuilder().build();
 
 
             } catch (Exception e) {

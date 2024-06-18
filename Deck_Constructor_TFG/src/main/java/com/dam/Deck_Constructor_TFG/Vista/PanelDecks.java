@@ -42,6 +42,7 @@ import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.MagicCardPDF;
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.ModificarCarta;
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.MtgApiRequest;
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.PersistenciaCartas;
+import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.PersistirDeck;
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.RecuperarMazosYFav;
 
 
@@ -69,7 +70,7 @@ public class PanelDecks extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public PanelDecks(Main_Window parentFrame) {
+	public PanelDecks(Main_Window parentFrame){
 		setBackground(colorPrimario);
 		this.parentFrame=parentFrame;
 		setAutoscrolls(true);
@@ -81,7 +82,7 @@ public class PanelDecks extends JPanel {
 		panel_IZQ.setPreferredSize(new Dimension(150, 10));
 		add(panel_IZQ, BorderLayout.WEST);
 		
-		JButton btnMisDecks = new JButton("Mis decks");
+		JButton btnMisDecks = new JButton("Mazos");
 		btnMisDecks.setBackground(colorBoton);
 		btnMisDecks.setForeground(colorTexto);
 		btnMisDecks.setMargin(new Insets(2, 20, 2, 20));
@@ -96,6 +97,18 @@ public class PanelDecks extends JPanel {
 		panel.setBackground(colorPrimario);
 		panel.setPreferredSize(new Dimension(140, 50));
 		panel_IZQ.add(panel);
+		
+		JButton btnPrincipal = new JButton("Principal");
+		btnPrincipal.setPreferredSize(new Dimension(120, 40));
+		btnPrincipal.setBackground(colorBoton);
+		btnPrincipal.setForeground(colorTexto);
+		btnPrincipal.setMargin(new Insets(2, 20, 2, 20));
+		btnPrincipal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionOccurred("btnPrincipal");
+			}
+		});
+		panel_IZQ.add(btnPrincipal);
 		btnMisDecks.setPreferredSize(new Dimension(120, 40));
 		panel_IZQ.add(btnMisDecks);
 		
@@ -111,19 +124,7 @@ public class PanelDecks extends JPanel {
 		btnFavoritos.setPreferredSize(new Dimension(120, 40));
 		panel_IZQ.add(btnFavoritos);
 		
-		JButton btnSocial = new JButton("Social");
-		btnSocial.setBackground(colorBoton);
-		btnSocial.setForeground(colorTexto);
-		btnSocial.setMargin(new Insets(2, 20, 2, 20));
-		btnSocial.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				actionOccurred("btnSocial");
-			}
-		});
-		btnSocial.setPreferredSize(new Dimension(120, 40));
-		panel_IZQ.add(btnSocial);
-		
-		JButton btnLogout = new JButton("Log out");
+		JButton btnLogout = new JButton("Salir");
 		btnLogout.setBackground(colorBoton);
 		btnLogout.setForeground(colorTexto);
 		btnLogout.setPreferredSize(new Dimension(120, 40));
@@ -163,6 +164,7 @@ public class PanelDecks extends JPanel {
 		comboBox.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		comboBox.setBounds(0, 11, 346, 22);
 		comboBox.addItem("Eldrazi Incursion DEMO PRUEBA");
+		
 		ArrayList<String> mazos = RecuperarMazosYFav.recuperarMazosUsuario(parentFrame.user);
 		if(mazos != null) {
 			for(String m : mazos) {
@@ -181,6 +183,38 @@ public class PanelDecks extends JPanel {
 		});
 		btnProxiesPDF.setBounds(419, 13, 137, 23);
 		panel_CENTER_NORTE.add(btnProxiesPDF);
+		
+		JButton btnManoInicial = new JButton("Mano inicial");
+		btnManoInicial.setBackground(colorBoton);
+		btnManoInicial.setForeground(colorTexto);
+		btnManoInicial.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				RobarCartasWindow dialog = new RobarCartasWindow(parentFrame, imageCache);
+                dialog.setLocationRelativeTo(null); // Center the dialog on the screen
+                dialog.setVisible(true);
+			}
+		});
+		btnManoInicial.setBounds(580, 13, 112, 23);
+		panel_CENTER_NORTE.add(btnManoInicial);
+		
+		JButton btnAnalizarMazo = new JButton("Analizar mazo");
+		btnAnalizarMazo.setBackground(colorBoton);
+		btnAnalizarMazo.setForeground(colorTexto);
+		btnAnalizarMazo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				EstadisticasWindow dialog;
+				try {
+					dialog = new EstadisticasWindow(parentFrame, deckCards);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+			}
+		});
+		btnAnalizarMazo.setBounds(728, 13, 131, 23);
+		panel_CENTER_NORTE.add(btnAnalizarMazo);
 			
 	
 		//Botones de abajo
@@ -194,35 +228,25 @@ public class PanelDecks extends JPanel {
 		panel_CENTER.add(panelBotones, BorderLayout.SOUTH);
 		panel_CENTER_CENTER.setLayout(new GridLayout(0, 2, 0, 0));
 		
+		JButton btnSocial = new JButton("Social");
+		btnSocial.setVisible(false);
+		btnSocial.setBackground(colorBoton);
+		btnSocial.setForeground(colorTexto);
+		btnSocial.setMargin(new Insets(2, 20, 2, 20));
+		btnSocial.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionOccurred("btnSocial");
+			}
+		});
+		btnSocial.setPreferredSize(new Dimension(120, 40));
+		panel_IZQ.add(btnSocial);
+		
 		JPanel panelRelleno = new JPanel();
 		panelRelleno.setBackground(colorPrimario);
 		panelRelleno.setMaximumSize(new Dimension(120, 32767));
 		panelRelleno.setPreferredSize(new Dimension(140, 10));
 		panel_IZQ.add(panelRelleno);
 		panelRelleno.setLayout(null);
-		////
-		//TEST
-		var sis = HibernateUtil.getSessionFactory().openSession();
-		sis.beginTransaction();
-		nombreDeckActual = "prueba";
-		Deck deck = new Deck(nombreDeckActual, "Standard", true);
-		
-
-		// Instanciación de objetos Carta
-		Carta carta1 = new Carta("Grindstone");
-		Carta carta2 = new Carta("Black lotus");
-		carta1.setDeck(deck);
-		carta2.setDeck(deck);
-		// Vinculación de cartas al deck
-		List<Carta> cartas = new ArrayList<>();
-		cartas.add(carta1);
-		cartas.add(carta2);
-		deck.setDeck_cards(cartas);
-
-		sis.merge(deck);
-		
-		sis.getTransaction().commit();
-		sis.close();
 		
 		//PANEL CARTAS DECK
 		MtgApiRequest api = MtgApiRequest.getInstance();
@@ -247,6 +271,8 @@ public class PanelDecks extends JPanel {
 		imageCache = new HashMap<>();
 		for (String c : cardNames) {
 		    String urlImagen = api.getImagenCarta(c);
+		    //PersistenciaCartas.addCartaMazoSilence(c, "Eldrazi Incursion DEMO PRUEBA");
+		    
 		    try {
 		        ImageIcon cardImage = new ImageIcon(ImageIO.read(new URL(urlImagen)));
 		        // Escalar la imagen
@@ -315,6 +341,7 @@ public class PanelDecks extends JPanel {
 		cardList.addListSelectionListener(new ListSelectionListener() {
 		    @Override
 		    public void valueChanged(ListSelectionEvent e) {
+		    	
 		        if (!e.getValueIsAdjusting()) { // Verificar si la selección ha terminado de cambiar
 		            int selectedIndex = cardList.getSelectedIndex();
 		            if (selectedIndex != -1) {
@@ -352,6 +379,7 @@ public class PanelDecks extends JPanel {
 		                
 		            }
 		        }
+		       
 		    }
 		   
 		});
@@ -408,11 +436,16 @@ public class PanelDecks extends JPanel {
 					
 				}
 			});
-
+//		 if(PersistirDeck.persistirDeck("Eldrazi Incursion DEMO PRUEBA", parentFrame.user)) {
+//			 for(String c : cardNames) {
+//				 PersistenciaCartas.addCartaMazoSilence(c, "Eldrazi Incursion DEMO PRUEBA");
+//			 }
+//		 }
 	}
 	private void recuperarYReferescarMazo(Main_Window parentFrame, MtgApiRequest api) {
 		deckCards = RecuperarMazosYFav.recuperarCartasMazo(parentFrame.user, nomMazo);
         cardListModel.clear();
+        imageCache.clear();
         
         for (String[] card : deckCards) {
 		    String urlImagen = api.getImagenCarta(card[0]);
@@ -458,6 +491,4 @@ public class PanelDecks extends JPanel {
            
         }
     }
-	
-	
 }

@@ -19,13 +19,12 @@ package com.dam.Deck_Constructor_TFG.Vista;
 	        getContentPane().add(etiqueta);
 	        pack();
 	        setLocationRelativeTo(null);
-	        setOpacity(1f); // Inicia totalmente opaco
+	        setOpacity(1f); 
 	    }
 
 	    public void mostrarToast() {
 	        setVisible(true);
 
-	        // Hilo para manejar la duración del toast
 	        new Thread(() -> {
 	            try {
 	                Thread.sleep(duracion);
@@ -37,7 +36,6 @@ package com.dam.Deck_Constructor_TFG.Vista;
 	    }
 
 	    private void desvanecer() {
-	        // Hilo para manejar el desvanecimiento del toast
 	        new Thread(() -> {
 	            try {
 	                for (float i = 1.0f; i >= 0; i -= 0.05f) {
@@ -54,9 +52,8 @@ package com.dam.Deck_Constructor_TFG.Vista;
 	            }
 	        }).start();
 	    }
-
+	    //Forma para invocarlo sin erroress
 	    public static void main(String[] args) {
-	        // Ejemplo de uso
 	        SwingUtilities.invokeLater(() -> {
 	            ToastDialog dialog = new ToastDialog("Carta añadida a Deck", 2000);
 	            dialog.mostrarToast();

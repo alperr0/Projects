@@ -47,7 +47,7 @@ public class MtgApiRequest {
 					.url("https://api.scryfall.com/cards/named?fuzzy=" + name).build();
 
 	        try (Response response = cliente.newCall(req).execute()) {
-	            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+	            if (!response.isSuccessful()) throw new IOException("Respuesta inesperada " + response);
 
 	            JSONObject jsonResponse = new JSONObject(response.body().string());
 	            cards.add(jsonResponse);

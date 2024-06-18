@@ -28,8 +28,8 @@ public class PanelLogin extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	private PanelEventListener listener;
-	private JTextField txtfUsuario;
-	private JPasswordField passField;
+	 JTextField txtfUsuario;
+	JPasswordField passField;
 	Main_Window parent;
 	String user;
 

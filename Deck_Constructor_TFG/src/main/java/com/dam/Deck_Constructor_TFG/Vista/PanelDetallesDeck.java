@@ -27,6 +27,7 @@ import com.dam.Deck_Constructor_TFG.Relaciones.HibernateUtil;
 import com.dam.Deck_Constructor_TFG.Relaciones.Controlador.ModificarCarta;
 import java.awt.Component;
 import javax.swing.JTextField;
+import java.awt.Rectangle;
 
 public class PanelDetallesDeck extends JPanel {
 
@@ -57,13 +58,14 @@ public class PanelDetallesDeck extends JPanel {
 		lblcartaInfo.setVerticalAlignment(SwingConstants.TOP);
 		lblcartaInfo.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblcartaInfo.setForeground(colorTexto);
-		lblcartaInfo.setBounds(49, 436, 413, 160);
+		lblcartaInfo.setBounds(49, 386, 413, 160);
 		add(lblcartaInfo);
 		
 		spinnerModel = new SpinnerNumberModel(1,1,4,1);
 	    
 		
 		btnAddFav = new JButton("Añadir a favoritos");
+		btnAddFav.setBounds(new Rectangle(0, 50, 0, 0));
 		btnAddFav.setBackground(colorBoton);
 		btnAddFav.setForeground(colorTexto);
 		btnAddFav.addActionListener(new ActionListener() {
@@ -72,12 +74,13 @@ public class PanelDetallesDeck extends JPanel {
 				
 			}
 		});
-		btnAddFav.setBounds(317, 607, 119, 23);
+		btnAddFav.setBounds(317, 577, 119, 23);
 		add(btnAddFav);
 		
 		Favoritos fav = new Favoritos();
 
 		btnRMDeck = new JButton("Eliminar Carta");
+		btnRMDeck.setBounds(new Rectangle(0, 5, 0, 0));
 		btnRMDeck.setBackground(colorBoton);
 		btnRMDeck.setForeground(colorTexto);
 		btnRMDeck.addActionListener(new ActionListener() {
@@ -85,33 +88,36 @@ public class PanelDetallesDeck extends JPanel {
 				
 			}
 		});
-		btnRMDeck.setBounds(188, 607, 119, 23);
+		btnRMDeck.setBounds(188, 577, 119, 23);
 		add(btnRMDeck);
 		
 		lblImagen = new JLabel("");
-		lblImagen.setBounds(113, 33, 278, 382);
+		lblImagen.setBounds(113, 33, 246, 346);
 		add(lblImagen);
 		
 		textField = new JTextField();
+		textField.setBounds(new Rectangle(0, 50, 0, 0));
 		textField.setBackground(colorPanel);
 		textField.setForeground(colorTexto);
 		textField.setHorizontalAlignment(SwingConstants.CENTER);
 		textField.setEditable(false);
-		textField.setBounds(59, 607, 69, 23);
+		textField.setBounds(59, 577, 69, 23);
 		add(textField);
 		textField.setColumns(10);
 		
 		btnSumar = new JButton("+");
+		btnSumar.setBounds(new Rectangle(0, 50, 0, 0));
 		btnSumar.setBackground(colorBoton);
 		btnSumar.setForeground(colorTexto);
-		btnSumar.setBounds(20, 607, 41, 23);
+		btnSumar.setBounds(20, 577, 41, 23);
 		add(btnSumar);
 		
 		btnRestar = new JButton("-");
+		btnRestar.setBounds(new Rectangle(0, 50, 0, 0));
 		btnRestar.setBackground(colorBoton);
 		btnRestar.setForeground(colorTexto);
 		btnRestar.setFont(new Font("Tahoma", Font.BOLD, 13));
-		btnRestar.setBounds(125, 607, 41, 23);
+		btnRestar.setBounds(125, 577, 41, 23);
 		add(btnRestar);
 		
 	}

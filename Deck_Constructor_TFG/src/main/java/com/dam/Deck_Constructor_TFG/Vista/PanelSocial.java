@@ -58,7 +58,7 @@ public class PanelSocial extends JPanel {
 		panel_IZQ.setPreferredSize(new Dimension(150, 10));
 		add(panel_IZQ, BorderLayout.WEST);
 		
-		JButton btnMisDecks = new JButton("Mis decks");
+		JButton btnMisDecks = new JButton("Mazos");
 		btnMisDecks.setMargin(new Insets(2, 20, 2, 20));
 		btnMisDecks.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

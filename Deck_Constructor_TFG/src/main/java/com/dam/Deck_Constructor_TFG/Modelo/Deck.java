@@ -49,6 +49,10 @@ public class Deck {
 		 this.publico=publico;
 		 this.deck_cards = new ArrayList<>();
 	 }
+	 public Deck(String nombre) {
+		 this.nombre=nombre;
+		 this.deck_cards = new ArrayList<>();
+	 }
 
 	public int getId() {
 		return id;

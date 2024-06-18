@@ -51,7 +51,7 @@ public class DialogNewDeck extends JDialog {
         panel.setForeground(colorTexto);
 
         nombreTextField = new JTextField(20);
-        nombreTextField.setBounds(96, 45, 166, 20);
+        nombreTextField.setBounds(96, 45, 166, 25);
         panel.add(nombreTextField);
         JLabel label_1 = new JLabel("Formato:");
         label_1.setForeground(colorTexto);
@@ -63,11 +63,13 @@ public class DialogNewDeck extends JDialog {
         formatoComboBox.setBounds(97, 87, 126, 20);
         panel.add(formatoComboBox);
         JLabel label_2 = new JLabel("Mazo público:");
+        label_2.setVisible(false);
         label_2.setForeground(colorTexto);
         label_2.setBounds(31, 128, 89, 14);
         panel.add(label_2);
 
         mazoPublicoRadioButton = new JRadioButton();
+        mazoPublicoRadioButton.setVisible(false);
         mazoPublicoRadioButton.setBounds(111, 121, 21, 21);
         panel.add(mazoPublicoRadioButton);
 

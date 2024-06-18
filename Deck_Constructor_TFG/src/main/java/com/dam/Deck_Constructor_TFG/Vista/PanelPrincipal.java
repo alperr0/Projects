@@ -70,7 +70,7 @@ public class PanelPrincipal extends JPanel {
 		panel_IZQ.setPreferredSize(new Dimension(150, 10));
 		add(panel_IZQ, BorderLayout.WEST);
 		
-		JButton btnMisDecks = new JButton("Mis decks");
+		JButton btnMisDecks = new JButton("Mazos");
 		btnMisDecks.setBackground(colorBoton);
 		btnMisDecks.setForeground(colorTexto);
 		btnMisDecks.setMargin(new Insets(2, 20, 2, 20));
@@ -85,6 +85,18 @@ public class PanelPrincipal extends JPanel {
 		panel.setBackground(colorPrimario);
 		panel.setPreferredSize(new Dimension(140, 50));
 		panel_IZQ.add(panel);
+		
+		JButton btnPrincipal = new JButton("Principal");
+		btnPrincipal.setPreferredSize(new Dimension(120, 40));
+		btnPrincipal.setBackground(colorBoton);
+		btnPrincipal.setForeground(colorTexto);
+		btnPrincipal.setMargin(new Insets(2, 20, 2, 20));
+		btnPrincipal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		panel_IZQ.add(btnPrincipal);
+		
 		btnMisDecks.setPreferredSize(new Dimension(120, 40));
 		panel_IZQ.add(btnMisDecks);
 		
@@ -100,19 +112,7 @@ public class PanelPrincipal extends JPanel {
 		btnFavoritos.setPreferredSize(new Dimension(120, 40));
 		panel_IZQ.add(btnFavoritos);
 		
-		JButton btnSocial = new JButton("Social");
-		btnSocial.setBackground(colorBoton);
-		btnSocial.setForeground(colorTexto);
-		btnSocial.setMargin(new Insets(2, 20, 2, 20));
-		btnSocial.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				actionOccurred("btnSocial");
-			}
-		});
-		btnSocial.setPreferredSize(new Dimension(120, 40));
-		panel_IZQ.add(btnSocial);
-		
-		JButton btnLogout = new JButton("Log out");
+		JButton btnLogout = new JButton("Salir");
 		btnLogout.setBackground(colorBoton);
 		btnLogout.setForeground(colorTexto);
 		btnLogout.setPreferredSize(new Dimension(120, 40));
@@ -167,9 +167,10 @@ public class PanelPrincipal extends JPanel {
 		panel_CENTER.add(panel_CENTER_CENTER, BorderLayout.CENTER);
 		
 		textFetchbar = new JTextField();
-		textFetchbar.setBounds(73, 11, 338, 20);
+		textFetchbar.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		textFetchbar.setBounds(73, 11, 338, 25);
 		panel_CENTER_NORTE.add(textFetchbar);
-		textFetchbar.setPreferredSize(new Dimension(50, 20));
+		textFetchbar.setPreferredSize(new Dimension(50, 25));
 		textFetchbar.setColumns(10);
 		
 		
@@ -253,6 +254,7 @@ public class PanelPrincipal extends JPanel {
 		panelBotones.setPreferredSize(new Dimension(100, 100));
 		
 		JButton btnIzquierda = new JButton();
+		btnIzquierda.setVisible(false);
 		btnIzquierda.setBackground(colorBoton);
 		btnIzquierda.setForeground(colorTexto);
 		btnIzquierda.addActionListener(new ActionListener() {
@@ -266,6 +268,7 @@ public class PanelPrincipal extends JPanel {
         btnIzquierda.setIcon(new ImageIcon(imgIzquierda));
 
 		JButton btnDerecha = new JButton();
+		btnDerecha.setVisible(false);
 		btnDerecha.setBackground(colorBoton);
 		btnDerecha.setForeground(colorTexto);
 		btnDerecha.setBounds(68, 5, 30, 30);
@@ -278,6 +281,19 @@ public class PanelPrincipal extends JPanel {
 		panelBotones.add(btnIzquierda);
 		panelBotones.add(btnDerecha);
 		panel_CENTER.add(panelBotones, BorderLayout.SOUTH);
+		
+		JButton btnSocial = new JButton("Social");
+		btnSocial.setVisible(false);
+		btnSocial.setBackground(colorBoton);
+		btnSocial.setForeground(colorTexto);
+		btnSocial.setMargin(new Insets(2, 20, 2, 20));
+		btnSocial.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionOccurred("btnSocial");
+			}
+		});
+		btnSocial.setPreferredSize(new Dimension(120, 40));
+		panel_IZQ.add(btnSocial);
 		
 		JPanel panelRelleno = new JPanel();
 		panelRelleno.setBackground(colorPrimario);
@@ -302,6 +318,7 @@ public class PanelPrincipal extends JPanel {
 		tablaRegistros.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		tablaRegistros.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); //Permite seleccionar una sola fila
 		PanelDetalles panelDetalles = new PanelDetalles(parentFrame);
+		panelDetalles.setEnabled(false);
 		panelDetalles.setBackground(colorPrimario);
 		panelDetalles.setMinimumSize(new Dimension(100, 0));
 		panelDetalles.setPreferredSize(new Dimension(350, 800));
@@ -315,6 +332,7 @@ public class PanelPrincipal extends JPanel {
 		tablaRegistros.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
+            	panelDetalles.setEnabled(true);
                 if (!e.getValueIsAdjusting()) { // Verificar si la selección ha terminado de cambiar
                     int selectedRow = tablaRegistros.getSelectedRow();
                     if (selectedRow != -1) {
